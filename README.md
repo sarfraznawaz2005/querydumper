@@ -1,5 +1,10 @@
 # Laravel QueryDumper
 
+[![Laravel 5.2](https://img.shields.io/badge/Laravel-5.2-brightgreen.svg?style=flat-square)](http://laravel.com)
+[![Laravel 5.3](https://img.shields.io/badge/Laravel-5.3-brightgreen.svg?style=flat-square)](http://laravel.com)
+[![Laravel 5.4](https://img.shields.io/badge/Laravel-5.4-brightgreen.svg?style=flat-square)](http://laravel.com)
+[![Total Downloads](https://poser.pugx.org/sarfraznawaz2005/querydumper/downloads)](https://packagist.org/packages/sarfraznawaz2005/querydumper)
+
 ## Introduction ##
 
 Simple Laravel 5 package to dump all running queries on the page. If it's `SELECT` query, it will also show `EXPLAIN` information against it.
