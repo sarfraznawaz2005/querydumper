@@ -16,4 +16,10 @@ return [
     */
 
     'querystring_name' => 'qqq',
+
+    /*
+    | If true, it will also format shown SQL queries.
+    */
+
+    'format_sql' => true,
 ];

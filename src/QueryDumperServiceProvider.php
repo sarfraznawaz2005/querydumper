@@ -5,6 +5,7 @@ namespace Sarfraznawaz2005\QueryDumper;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
+use Sarfraznawaz2005\QueryDumper\Libs\SqlFormatter;
 
 class QueryDumperServiceProvider extends ServiceProvider
 {
@@ -28,20 +29,25 @@ class QueryDumperServiceProvider extends ServiceProvider
 
         DB::listen(function ($sql, $bindings = null, $time = null) {
             if ($sql instanceof QueryExecuted) {
+                $formatMethod = config('querydumper.format_sql') ? 'format' : 'highlight';
+
                 $time = $sql->time;
+
                 $query = $this->applyBindings($sql->sql, $sql->bindings);
                 $queryParts = explode(' ', $sql->sql);
 
                 if (strtolower($queryParts[0]) === 'select') {
                     $result = DB::select(DB::raw('EXPLAIN ' . $query));
 
-                    $table = '<strong>' . $query . ' (' . $time . 'ms)</strong>';
-                    $table .= $this->table([(array)$result[0]]);
+                    if (isset($result[0])) {
+                        $table = 'Time: <strong>' . $time . 'ms</strong><br>' . SqlFormatter::$formatMethod($query);
+                        $table .= $this->table([(array)$result[0]]);
 
-                    echo '<div style="background: #ccc; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px;">' . $table . '</div>';
+                        echo '<div style="background: #F7F0CB; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px; width:auto;">' . $table . '</div>';
+                    }
                 } else {
                     if (strtolower($queryParts[0]) !== 'explain') {
-                        echo '<div style="background: #ccc; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px;"><strong>' . $query . '</strong></div>';
+                        echo '<div style="background: #F7F0CB; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px; width:auto;"><strong>' . SqlFormatter::$formatMethod($query) . '</strong></div>';
                     }
                 }
             }
@@ -114,7 +120,7 @@ class QueryDumperServiceProvider extends ServiceProvider
             $rows[] = vsprintf($form, $e);
         }
 
-        echo "<pre style='margin: 50px 20px 0 20px;'>\n";
+        echo "<pre style='margin: 50px 20px 0 20px; background: #F7F0CB; font-weight:bold; border-radius: 0; border:0; font-size:12px;'>\n";
         echo $line . implode($line, $rows) . $line;
         echo "</pre>\n";
     }
