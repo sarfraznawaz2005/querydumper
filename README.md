@@ -10,7 +10,7 @@ Simple Laravel 5 package to dump all running queries on the page. If it's `SELEC
 
 ## Requirements ##
 
- - PHP >= 5.6.40
+ - PHP >= 5.6.16
  - Laravel 5 (tested on Laravel 5.1, 5.2,  5.3 and 5.4)
 
 ## Installation ##
