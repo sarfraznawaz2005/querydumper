@@ -1,5 +1,7 @@
 # Laravel QueryDumper
 
+<a href="https://packagist.org/packages/sarfraznawaz2005/querydumper"><img src="https://poser.pugx.org/sarfraznawaz2005/querydumper/version" alt="Stable Build" /></a>
+<a href="https://codeclimate.com/github/sarfraznawaz2005/querydumper"><img src="https://codeclimate.com/github/sarfraznawaz2005/querydumper/badges/gpa.svg" /></a>
 [![Laravel 5.1](https://img.shields.io/badge/Laravel-5.1-brightgreen.svg?style=flat-square)](http://laravel.com)
 [![Laravel 5.2](https://img.shields.io/badge/Laravel-5.2-brightgreen.svg?style=flat-square)](http://laravel.com)
 [![Laravel 5.3](https://img.shields.io/badge/Laravel-5.3-brightgreen.svg?style=flat-square)](http://laravel.com)
