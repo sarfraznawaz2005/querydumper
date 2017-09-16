@@ -1,2 +1,4 @@
+PHP: true
+
 exclude_paths:
 - "src/libs/SqlFormatter.php"
