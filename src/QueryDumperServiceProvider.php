@@ -28,29 +28,33 @@ class QueryDumperServiceProvider extends ServiceProvider
         }
 
         DB::listen(function ($sql, $bindings = null, $time = null) {
-            if ($sql instanceof QueryExecuted) {
-                $formatMethod = config('querydumper.format_sql') ? 'format' : 'highlight';
+            $formatMethod = config('querydumper.format_sql') ? 'format' : 'highlight';
 
+            if ($sql instanceof QueryExecuted) {
                 $time = $sql->time;
 
                 $query = $this->applyBindings($sql->sql, $sql->bindings);
                 $queryParts = explode(' ', $sql->sql);
+            } else {
+                $query = $this->applyBindings($sql, $bindings);
+                $queryParts = explode(' ', $sql);
+            }
 
-                if (strtolower($queryParts[0]) === 'select') {
-                    $result = DB::select(DB::raw('EXPLAIN ' . $query));
+            if (strtolower($queryParts[0]) === 'select') {
+                $result = DB::select(DB::raw('EXPLAIN ' . $query));
 
-                    if (isset($result[0])) {
-                        $table = 'Time: <strong>' . $time . 'ms</strong><br>' . SqlFormatter::$formatMethod($query);
-                        $table .= $this->table([(array)$result[0]]);
+                if (isset($result[0])) {
+                    $table = 'Time: <strong>' . $time . 'ms</strong><br>' . SqlFormatter::$formatMethod($query);
+                    $table .= $this->table([(array)$result[0]]);
 
-                        echo '<div style="background: #F7F0CB; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px; width:auto;">' . $table . '</div>';
-                    }
-                } else {
-                    if (strtolower($queryParts[0]) !== 'explain') {
-                        echo '<div style="background: #F7F0CB; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px; width:auto;"><strong>' . SqlFormatter::$formatMethod($query) . '</strong></div>';
-                    }
+                    echo '<div style="background: #F7F0CB; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px; width:auto;">' . $table . '</div>';
+                }
+            } else {
+                if (strtolower($queryParts[0]) !== 'explain') {
+                    echo '<div style="background: #F7F0CB; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px; width:auto;"><strong>' . SqlFormatter::$formatMethod($query) . '</strong></div>';
                 }
             }
+
         });
     }
 
