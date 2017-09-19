@@ -21,12 +21,12 @@ return [
     | If true, it will also format shown SQL queries.
     */
 
-    'format_sql' => true,
+    'format_sql' => false,
 
     /*
     | If true, it will dump queries on current page. If affects your layout,
     | you can set this to false and be able to view dumped queries in new page.
     */
 
-    'same_page' => false,
+    'same_page' => true,
 ];
