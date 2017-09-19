@@ -45,8 +45,8 @@ class QueryDumperServiceProvider extends ServiceProvider
         DB::listen(function ($sql, $bindings = null, $time = null) {
             if ($sql instanceof QueryExecuted) {
                 $time = $sql->time;
-                $sql = $sql->sql;
                 $bindings = $sql->bindings;
+                $sql = $sql->sql;
             }
 
             $this->output($sql, $bindings, $time);
