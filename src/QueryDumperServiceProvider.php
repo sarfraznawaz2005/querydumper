@@ -16,8 +16,15 @@ class QueryDumperServiceProvider extends ServiceProvider
      */
     protected $defer = false;
 
+    private static $counter;
+
     public function boot()
     {
+        // routes
+        if (!$this->app->routesAreCached()) {
+            require __DIR__ . '/routes.php';
+        }
+
         // publish our files over to main laravel app
         $this->publishes([
             __DIR__ . '/config/querydumper.php' => config_path('querydumper.php')
@@ -27,31 +34,57 @@ class QueryDumperServiceProvider extends ServiceProvider
             return;
         }
 
+        self::$counter = 1;
+
+        if (!is_dir(__DIR__ . '/tmp')) {
+            mkdir(__DIR__ . '/tmp');
+        } else {
+            @unlink(__DIR__ . '/tmp/log.html');
+        }
+
         DB::listen(function ($sql, $bindings = null, $time = null) {
             if ($sql instanceof QueryExecuted) {
-                $formatMethod = config('querydumper.format_sql') ? 'format' : 'highlight';
-
                 $time = $sql->time;
-
-                $query = $this->applyBindings($sql->sql, $sql->bindings);
-                $queryParts = explode(' ', $sql->sql);
-
-                if (strtolower($queryParts[0]) === 'select') {
-                    $result = DB::select(DB::raw('EXPLAIN ' . $query));
-
-                    if (isset($result[0])) {
-                        $table = 'Time: <strong>' . $time . 'ms</strong><br>' . SqlFormatter::$formatMethod($query);
-                        $table .= $this->table([(array)$result[0]]);
-
-                        echo '<div style="background: #F7F0CB; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px; width:auto;">' . $table . '</div>';
-                    }
-                } else {
-                    if (strtolower($queryParts[0]) !== 'explain') {
-                        echo '<div style="background: #F7F0CB; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px; width:auto;"><strong>' . SqlFormatter::$formatMethod($query) . '</strong></div>';
-                    }
-                }
+                $sql = $sql->sql;
+                $bindings = $sql->bindings;
             }
+
+            $this->output($sql, $bindings, $time);
         });
+    }
+
+    protected function output($sql, $bindings, $time)
+    {
+        self::$counter++;
+
+        $currentQuery = '';
+        $samePage = config('querydumper.same_page');
+        $formatMethod = config('querydumper.format_sql') ? 'format' : 'highlight';
+
+        $query = $this->applyBindings($sql, $bindings);
+        $queryParts = explode(' ', $sql);
+
+        if (strtolower($queryParts[0]) === 'select') {
+            $currentQuery = '<strong>#' . (--self::$counter) . ' - ' . $time . 'ms</strong><br>' . SqlFormatter::$formatMethod($query);
+
+            $result = DB::select(DB::raw('EXPLAIN ' . $query));
+
+            if (isset($result[0])) {
+                $currentQuery .= $this->table([(array)$result[0]]);
+            }
+        } else {
+            if (strtolower($queryParts[0]) !== 'explain') {
+                $currentQuery = SqlFormatter::$formatMethod($query);
+            }
+        }
+
+        $currentQuery = '<div style="background: #F7F0CB; margin: 0 20px 0 20px; overflow:auto; color:#000; padding: 5px; width:auto;">' . $currentQuery . '</div>';
+
+        if (!$samePage) {
+            file_put_contents(__DIR__ . '/tmp/log.html', $currentQuery, FILE_APPEND);
+        } else {
+            echo $currentQuery;
+        }
     }
 
     /**
@@ -64,7 +97,7 @@ class QueryDumperServiceProvider extends ServiceProvider
         //
     }
 
-    private function isEnabled()
+    protected function isEnabled()
     {
         $enabled = config('querydumper.enabled');
 
@@ -81,7 +114,7 @@ class QueryDumperServiceProvider extends ServiceProvider
         return request()->exists($queryString);
     }
 
-    private function applyBindings($sql, array $bindings)
+    protected function applyBindings($sql, array $bindings)
     {
         if (empty($bindings)) {
             return $sql;
@@ -120,8 +153,6 @@ class QueryDumperServiceProvider extends ServiceProvider
             $rows[] = vsprintf($form, $e);
         }
 
-        echo "<pre style='margin: 50px 20px 0 20px; background: #F7F0CB; font-weight:bold; border-radius: 0; border:0; font-size:12px;'>\n";
-        echo $line . implode($line, $rows) . $line;
-        echo "</pre>\n";
+        return "<pre>\n" . $line . implode($line, $rows) . $line . "</pre>\n";
     }
 }
