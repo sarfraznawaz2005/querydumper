@@ -36,8 +36,9 @@ Run `php artisan vendor:publish` to publish package's config file. You should no
 ## Config Options ##
 
  - `enabled` : Enable or disable query dumper. By default it is disabled. If you are on local environment, you can also just add `QUERYDUMPER=true` to env file to enable it.
- - `querystring_name` : Whatever value for this config is set, you will be able to see all running quries by appending this value in your url as query string. Example: `http://www.yourapp.com/someurl?qqq`
- - `format_sql` : If true, it will also format shown SQL queries.
+ - `querystring_name` : Whatever value for this config is set, you will be able to see all running quries by appending this value in your url as query string. Example: `http://www.yourapp.com/someurl?qqq`. Default value is `qqq`.
+ - `format_sql` : If true, it will also format shown SQL queries. Default `false`.
+ - `same_page` : If true, it will dump queries on current page you are on. If it affects your layout, you can set this to `false` and be able to view dumped queries on a page available at url `http://yoursite.com/querydumper/dump`. In this case, first visit the page you want to see queries of by appending `?querystring_name` value there and then visit `querydumper/dump` route to see quries for your last visited page. Default `false`.
 
 ## License ##
 
