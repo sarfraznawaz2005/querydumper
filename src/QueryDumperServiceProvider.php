@@ -64,6 +64,11 @@ class QueryDumperServiceProvider extends ServiceProvider
         $query = $this->applyBindings($sql, $bindings);
         $queryParts = explode(' ', $sql);
 
+        if (gettype($query) != 'string') {
+            $query = $query->getValue();
+            $queryParts = explode(' ', $sql);
+        }
+
         if (strtolower($queryParts[0]) === 'select') {
             $currentQuery = '<strong>#' . (--self::$counter) . ' - ' . $time . 'ms</strong><br>' . SqlFormatter::$formatMethod($query);
 
