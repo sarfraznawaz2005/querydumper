@@ -781,6 +781,11 @@ class SqlFormatter
                 self::TOKEN_TYPE => self::TOKEN_TYPE_WHITESPACE
             );
         }
+        
+        if (gettype($string) != 'string') {
+            $string = (array)$string;
+            $string = current($string);
+        }        
 
         // Comment
         if ($string[0] === '#' || (isset($string[1]) && ($string[0] === '-' && $string[1] === '-') || ($string[0] === '/' && $string[1] === '*'))) {
