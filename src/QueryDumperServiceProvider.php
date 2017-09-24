@@ -2,9 +2,11 @@
 
 namespace Sarfraznawaz2005\QueryDumper;
 
+use Event;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
+use function implode;
 use Sarfraznawaz2005\QueryDumper\Libs\SqlFormatter;
 
 class QueryDumperServiceProvider extends ServiceProvider
@@ -17,6 +19,7 @@ class QueryDumperServiceProvider extends ServiceProvider
     protected $defer = false;
 
     private static $counter;
+    private static $queries = [];
 
     public function boot()
     {
@@ -50,6 +53,12 @@ class QueryDumperServiceProvider extends ServiceProvider
             }
 
             $this->output($sql, $bindings, $time);
+        });
+
+        // Fired when laravel is done sending response. We use this event so that our
+        // response is not repeated
+        Event::listen('kernel.handled', function () {
+            echo implode("", self::$queries);
         });
     }
 
@@ -88,7 +97,7 @@ class QueryDumperServiceProvider extends ServiceProvider
         if (!$samePage) {
             file_put_contents(__DIR__ . '/tmp/log.html', $currentQuery, FILE_APPEND);
         } else {
-            echo $currentQuery;
+            self::$queries[] = $currentQuery;
         }
     }
 
