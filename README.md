@@ -1,3 +1,6 @@
+[Use this package instead](https://github.com/sarfraznawaz2005/indexer)
+
+
 # Laravel QueryDumper
 
 [![laravel 5.1](https://img.shields.io/badge/Laravel-5.1-brightgreen.svg?style=flat-square)](http://laravel.com)
