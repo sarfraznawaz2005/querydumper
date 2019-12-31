@@ -1,4 +1,8 @@
+**Abandoned:**
+
 [Use this package instead](https://github.com/sarfraznawaz2005/indexer)
+
+---
 
 
 # Laravel QueryDumper
